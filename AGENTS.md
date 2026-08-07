@@ -1,14 +1,43 @@
 # mine_mcp
 
-## Objetivo
-- Servidor MCP em TypeScript para registrar e consultar pontos do mapa Minecraft a partir de coordenadas X/Z.
+Servidor MCP TypeScript (stdio) para pontos de mapa Minecraft (X/Z), receitas/guias e integração exaroton — independente do workspace de mundo.
 
-## Dados do workspace
-- O mundo-fonte fica em `../world`.
-- O render do uNmINeD fica em `../output`.
-- Pontos registrados pelo MCP ficam em `./data/points.json`.
+| Campo | Valor |
+|---|---|
+| Stack | TypeScript NodeNext, `@modelcontextprotocol/sdk`, Zod, Jest, pnpm |
+| Classificação MCP | Servidor MCP (tools + resources; sem prompts) |
+| Domínio guideline | `mcp` → `$nero` → `references/guidelines/mcp-guidelines.md` |
+| Knowledge Nero | domínio `minecraft`, projeto `mine_mcp` |
+| Entry / transport | `src/index.ts` → `dist/index.js` · stdio |
+| Validação | `pnpm run check` (typecheck + test) · `pnpm run build` |
 
-## Regras
-- A arquitetura deve permanecer em TypeScript.
-- Os testes usam Jest e devem cobrir persistencia e consultas principais para prevenir regressões.
-- Testes validados e já configurados não devem ser alterados depois, a menos que isso seja estritamente solicitado.
+## Como usar este contexto
+
+| Quando | Ler |
+|---|---|
+| Orientação geral | `AGENTS.md` (este) |
+| Índice de referências | `.agents/references/index.md` |
+| Layout / fronteiras | `.agents/references/structure.md` |
+| Boot, env, transport | `.agents/references/runtime.md` |
+| Inventário tools/resources | `.agents/references/contracts.md` |
+| Secrets / allowlists | `.agents/references/security.md` |
+| Propósito / backlog | `.agents/references/domain.md` |
+| Cópia do backlog | `docs/backlog.md` |
+| Como mudar e testar | `.agents/references/conventions.md` |
+| Padrões locais | `.agents/references/patterns.md` |
+| Dívida vs guideline | `.agents/references/tech-debt.md` |
+| Guideline MCP (não copiar) | `$nero` → `references/guidelines/mcp-guidelines.md` |
+
+## Regras rápidas
+
+- Mudanças localizadas: regras em `src/services/`, persistência em `src/repository/`, contrato MCP (Zod/tools/resources) em `src/index.ts`.
+- stdout = JSON-RPC; logs humanos em stderr (`console.error`).
+- Não acoplar a `../world` / `../output`; layout plano na raiz (`src/`, sem pasta `mine_mcp/` aninhada).
+- Persistência JSON em `data/` (ou `MINE_MCP_DATA_DIR`); backlog residual em `docs/backlog.md`.
+- Não alterar testes validados sem pedido explícito; não registrar secrets/valores de env.
+
+## Skills condicionais
+
+- Sempre: `$nero` + MCP `nero-knowledge-base` (workspace sob `projetos/personal`).
+- Guideline: `$nero` → `references/guidelines/mcp-guidelines.md`.
+- Sem Domain Skill de produto/lib neste checkout — omitir.

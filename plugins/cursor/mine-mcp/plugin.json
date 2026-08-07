@@ -1,0 +1,15 @@
+{
+  "name": "mine-mcp",
+  "version": "0.2.0",
+  "description": "Cursor plugin packaging for mine_mcp skill + MCP server",
+  "skills": ["./skills/mine-mcp"],
+  "mcpServers": {
+    "mine_mcp": {
+      "command": "node",
+      "args": ["${workspaceFolder}/dist/index.js"],
+      "env": {
+        "MINE_MCP_DATA_DIR": "${env:MINE_MCP_DATA_DIR}"
+      }
+    }
+  }
+}

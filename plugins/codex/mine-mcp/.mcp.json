@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "mine_mcp": {
+      "command": "node",
+      "args": ["${MINE_MCP_ROOT}/dist/index.js"],
+      "env": {
+        "MINE_MCP_DATA_DIR": "${MINE_MCP_DATA_DIR}"
+      }
+    }
+  }
+}

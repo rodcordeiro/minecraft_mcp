@@ -1,161 +1,93 @@
 # mine_mcp
 
-Servidor MCP do workspace de Minecraft para:
+Servidor MCP TypeScript (stdio) independente para:
 
-- registrar pontos de mapa e receitas;
-- consultar distancias e pontos proximos;
-- integrar com o exaroton para inspecionar arquivos e baixar mundos para o workspace local.
-
-## Escopo
-
-O servidor expoe tools de apoio operacional para este workspace em `C:\Users\rodrigo.cordeiro\projetos\personal\minecraft`.
-
-Capacidades atuais:
-
-- contexto do workspace (`world`, `output`, `downloads`, `data`);
-- pontos persistidos em JSON;
-- receitas e guias persistidos em JSON;
-- leitura basica de conta e servidor no exaroton;
-- inspecao de arquivos remotos no exaroton;
-- download de arquivos e diretorios do exaroton;
-- download de mundos do exaroton para o workspace local.
+- pontos de mapa Minecraft (coordenadas X/Z);
+- receitas e guias (farm, build, potion, etc.);
+- inspeção/download de arquivos e mundos via API REST exaroton.
 
 ## Requisitos
 
-- Node.js 20+;
-- `pnpm`;
-- dependencias instaladas em `mine_mcp/node_modules`.
+- Node.js 20+
+- pnpm
 
-Para as tools do exaroton:
+```bash
+pnpm install
+pnpm run build
+```
 
-- `EXAROTON_API_TOKEN` obrigatorio;
-- `EXAROTON_SERVER_ID` opcional, mas recomendado quando um servidor e usado com frequencia.
+## Configuração (env do client MCP)
 
-## Estrutura
+| Variável | Default | Função |
+|---|---|---|
+| `MINE_MCP_DATA_DIR` | `<repo>/data` | Pasta com `points.json` e `recipes.json` |
+| `MINE_MCP_DOWNLOADS_DIR` | `<repo>/downloads` | Sandbox de downloads exaroton |
+| `EXAROTON_API_TOKEN` | — | Obrigatório para tools exaroton |
+| `EXAROTON_SERVER_ID` | — | Servidor padrão (opcional) |
 
-- `src/index.ts`: registro do servidor MCP, resources e tools.
-- `src/services/exaroton-service.ts`: acesso REST ao exaroton e logica de download.
-- `src/services/map-service.ts`: regras de pontos e distancias.
-- `src/services/recipe-service.ts`: regras de receitas.
-- `data/points.json`: armazenamento dos pontos.
-- `data/recipes.json`: armazenamento das receitas.
+Se `recipes.json` não existir em `MINE_MCP_DATA_DIR`, o servidor copia o seed empacotado `data/recipes.seed.json`. Edite o arquivo no `data/` do client para incrementar/alterar receitas.
+
+Exemplo de MCP client:
+
+```json
+{
+  "mcpServers": {
+    "mine_mcp": {
+      "command": "node",
+      "args": ["C:/path/to/minecraft_mcp/dist/index.js"],
+      "env": {
+        "MINE_MCP_DATA_DIR": "C:/path/to/user-data"
+      }
+    }
+  }
+}
+```
 
 ## Scripts
 
-- `pnpm run dev`: executa o servidor a partir do TypeScript via `tsx`.
-- `pnpm run typecheck`: valida tipos sem gerar build.
-- `pnpm run test`: executa a suite de testes.
-- `pnpm run build`: gera `dist/`.
+| Script | Ação |
+|---|---|
+| `pnpm run check` | typecheck + test |
+| `pnpm run typecheck` | tipos sem emit |
+| `pnpm run test` | Jest (inclui e2e stdio) |
+| `pnpm run build` | gera `dist/` (prebuild roda check) |
+| `pnpm run dev` | `tsx src/index.ts` |
 
-## Resources MCP
+## Estrutura
 
-- `mine-mcp://workspace/context`
-  Retorna caminhos relevantes do workspace, incluindo `world`, `output` e `downloads`.
+- `src/index.ts` — MCP server, resources e tools
+- `src/config.ts` — paths via env
+- `src/services/` — regras
+- `src/repository/` — persistência JSON
+- `data/recipes.seed.json` — seed de receitas
+- `skills/mine-mcp/` — skill do agente
+- `plugins/codex/mine-mcp/` — plugin Codex (skill + MCP)
+- `plugins/cursor/mine-mcp/` — plugin Cursor (skill + MCP)
+- `docs/backlog.md` — backlog
 
-- `mine-mcp://integrations/exaroton`
-  Retorna o estado de configuracao da integracao do exaroton e as capacidades habilitadas no codigo.
+## Resources
 
-## Tools MCP
+- `mine-mcp://workspace/context` — paths efetivos
+- `mine-mcp://integrations/exaroton` — estado da integração (sem token)
 
-### Mapa e receitas
+## Tools
 
-- `register_point`
-- `list_points`
-- `distance_to_point`
-- `nearest_point_by_type`
-- `register_recipe`
-- `list_recipes`
-- `get_recipe`
+**Mapa:** `register_point`, `list_points`, `distance_to_point`, `nearest_point_by_type`  
+**Receitas:** `register_recipe`, `list_recipes`, `get_recipe`  
+**exaroton:** `exaroton_get_account`, `exaroton_list_servers`, `exaroton_get_server`, `exaroton_get_server_ram`, `exaroton_get_file_info`, `exaroton_get_text_file`, `exaroton_download_file`, `exaroton_download_directory`, `exaroton_download_world`
 
-### exaroton
+Detalhes de parâmetros e casos de uso: `skills/mine-mcp/SKILL.md`.
 
-- `exaroton_get_account`
-  Retorna os dados da conta autenticada.
+## Segurança
 
-- `exaroton_list_servers`
-  Lista os servidores visiveis para o token configurado.
+- Não committe tokens.
+- Downloads restritos a `MINE_MCP_DOWNLOADS_DIR`.
+- stdout é JSON-RPC; logs em stderr.
 
-- `exaroton_get_server`
-  Retorna o overview do servidor, com status nomeado e RAM configurada quando disponivel.
+## CI
 
-- `exaroton_get_server_ram`
-  Retorna a RAM configurada do servidor.
+GitHub Actions (`.github/workflows/ci.yml`): install → typecheck → test → build em Node 20.
 
-- `exaroton_get_file_info`
-  Consulta metadados de um arquivo ou diretorio remoto.
+## Versão
 
-- `exaroton_get_text_file`
-  Le um arquivo texto remoto como UTF-8.
-
-- `exaroton_download_file`
-  Baixa um arquivo remoto para dentro do workspace local.
-
-- `exaroton_download_directory`
-  Baixa recursivamente um diretorio remoto para dentro do workspace local.
-
-- `exaroton_download_world`
-  Atalho para baixar um mundo remoto, como `world`, `world_nether` ou `world_the_end`.
-
-## Regras operacionais
-
-- Downloads do exaroton sao limitados ao workspace deste projeto.
-- O destino padrao dos downloads fica em `downloads/exaroton/`.
-- O servidor rejeita caminhos que tentem escapar do workspace com `..`.
-- A integracao atual usa a API REST do exaroton; streaming em websocket ainda nao faz parte do servidor.
-
-## Exemplos de uso
-
-Consultar metadados do diretorio principal do mundo:
-
-```json
-{
-  "tool": "exaroton_get_file_info",
-  "arguments": {
-    "filePath": "world"
-  }
-}
-```
-
-Baixar um arquivo especifico:
-
-```json
-{
-  "tool": "exaroton_download_file",
-  "arguments": {
-    "filePath": "world/level.dat",
-    "destinationPath": "downloads/exaroton/world/level.dat"
-  }
-}
-```
-
-Baixar o mundo principal:
-
-```json
-{
-  "tool": "exaroton_download_world",
-  "arguments": {
-    "worldPath": "world",
-    "destinationDir": "downloads/exaroton/world"
-  }
-}
-```
-
-## Desenvolvimento
-
-Fluxo recomendado ao evoluir o servidor:
-
-1. alterar o codigo em `src/`;
-2. rodar `pnpm run typecheck`;
-3. rodar `pnpm run test`;
-4. rodar `pnpm run build`;
-5. reiniciar a sessao/cliente MCP que consome o `dist/index.js`.
-
-## Versao atual
-
-`0.2.0`
-
-Motivacao desta versao:
-
-- o projeto deixou de ser apenas um MCP de pontos/receitas;
-- agora inclui integracao pratica com exaroton para leitura de arquivos e download de mundos;
-- houve ampliacao relevante de escopo sem quebra deliberada da interface ja existente.
+`0.2.0` — servidor independente, `data/` via env, seed de receitas, skill e plugins Codex/Cursor.

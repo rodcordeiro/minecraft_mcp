@@ -1,0 +1,20 @@
+{
+  "name": "mine-mcp",
+  "version": "0.2.0",
+  "description": "Minecraft map points, recipes and optional exaroton access via MCP, plus agent skill.",
+  "author": {
+    "name": "Rodrigo Cordeiro"
+  },
+  "license": "MIT",
+  "keywords": ["minecraft", "mcp", "exaroton", "recipes", "map"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "mine_mcp",
+    "shortDescription": "Minecraft MCP: points, recipes, exaroton",
+    "longDescription": "Installs the mine_mcp skill and stdio MCP server for overworld map points, recipe guides, and optional exaroton file/world downloads. Configure MINE_MCP_DATA_DIR for user-owned JSON stores.",
+    "developerName": "Rodrigo Cordeiro",
+    "category": "Developer Tools",
+    "capabilities": ["Write"]
+  }
+}

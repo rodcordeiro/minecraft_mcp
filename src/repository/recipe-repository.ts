@@ -5,7 +5,10 @@ import { Recipe, RecipeStore } from "../types.js";
 const emptyStore: RecipeStore = { recipes: [] };
 
 export class RecipeRepository {
-  constructor(private readonly dataFile: string) {}
+  constructor(
+    private readonly dataFile: string,
+    private readonly seedFile?: string
+  ) {}
 
   /** Returns all stored recipes, creating the file lazily if needed. */
   async list(): Promise<Recipe[]> {
@@ -40,11 +43,32 @@ export class RecipeRepository {
     } catch (error) {
       const nodeError = error as NodeJS.ErrnoException;
       if (nodeError.code === "ENOENT") {
-        await this.writeStore(emptyStore);
-        return emptyStore;
+        const seeded = await this.tryLoadSeed();
+        const store = seeded ?? emptyStore;
+        await this.writeStore(store);
+        return store;
       }
 
       throw error;
+    }
+  }
+
+  /** Loads packaged seed recipes when the user store does not exist yet. */
+  private async tryLoadSeed(): Promise<RecipeStore | undefined> {
+    if (!this.seedFile) {
+      return undefined;
+    }
+
+    try {
+      const raw = await fs.readFile(this.seedFile, "utf-8");
+      const parsed = JSON.parse(raw) as RecipeStore;
+      if (!Array.isArray(parsed.recipes)) {
+        return undefined;
+      }
+
+      return { recipes: parsed.recipes };
+    } catch {
+      return undefined;
     }
   }
 

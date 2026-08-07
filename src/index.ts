@@ -10,7 +10,7 @@ import { MapService } from "./services/map-service.js";
 import { RecipeService } from "./services/recipe-service.js";
 
 const pointRepository = new PointRepository(paths.dataFile);
-const recipeRepository = new RecipeRepository(paths.recipesFile);
+const recipeRepository = new RecipeRepository(paths.recipesFile, paths.recipesSeedFile);
 const mapService = new MapService(pointRepository);
 const recipeService = new RecipeService(recipeRepository);
 const exarotonService = new ExarotonService();
@@ -24,7 +24,7 @@ server.registerResource(
   "workspace-context",
   "mine-mcp://workspace/context",
   {
-    title: "Minecraft workspace context",
+    title: "mine_mcp server context",
     description: "Directories and files used by the MCP server.",
     mimeType: "application/json"
   },
@@ -35,12 +35,16 @@ server.registerResource(
         mimeType: "application/json",
         text: JSON.stringify(
           {
-            workspaceRoot: paths.workspaceRoot,
-            worldDir: paths.worldDir,
-            outputDir: paths.outputDir,
+            projectRoot: paths.projectRoot,
+            dataDir: paths.dataDir,
             downloadsDir: paths.downloadsDir,
             dataFile: paths.dataFile,
-            recipesFile: paths.recipesFile
+            recipesFile: paths.recipesFile,
+            recipesSeedFile: paths.recipesSeedFile,
+            env: {
+              MINE_MCP_DATA_DIR: process.env.MINE_MCP_DATA_DIR || null,
+              MINE_MCP_DOWNLOADS_DIR: process.env.MINE_MCP_DOWNLOADS_DIR || null
+            }
           },
           null,
           2
@@ -79,9 +83,8 @@ server.registerResource(
               "world_download"
             ],
             notes: [
-              "The exaroton Node client and official docs expose richer websocket streams for status, stats, heap and tick times.",
-              "This MCP increment focuses on REST snapshots plus explicit file downloads into the local workspace.",
-              "Download destinations are restricted to the Minecraft workspace root."
+              "Downloads are sandboxed under MINE_MCP_DOWNLOADS_DIR (default: <project>/downloads).",
+              "REST snapshots only; websocket streams are out of scope for this server."
             ]
           },
           null,
@@ -212,15 +215,15 @@ server.tool(
 
 server.tool(
   "exaroton_download_file",
-  "Download a single file from exaroton into the local Minecraft workspace.",
+  "Download a single file from exaroton into the configured downloads directory.",
   {
     filePath: z.string().min(1),
     destinationPath: z.string().min(1).optional(),
     serverId: z.string().min(1).optional()
   },
   async ({ filePath, destinationPath, serverId }) => {
-    const resolvedDestinationPath = resolveWorkspacePath(
-      destinationPath ?? path.join("downloads", "exaroton", path.basename(filePath))
+    const resolvedDestinationPath = resolveDownloadPath(
+      destinationPath ?? path.join("exaroton", path.basename(filePath))
     );
     const result = await exarotonService.downloadFile(filePath, resolvedDestinationPath, serverId);
 
@@ -237,15 +240,15 @@ server.tool(
 
 server.tool(
   "exaroton_download_directory",
-  "Download a remote exaroton directory recursively into the local Minecraft workspace.",
+  "Download a remote exaroton directory recursively into the configured downloads directory.",
   {
     remotePath: z.string().min(1),
     destinationDir: z.string().min(1).optional(),
     serverId: z.string().min(1).optional()
   },
   async ({ remotePath, destinationDir, serverId }) => {
-    const resolvedDestinationDir = resolveWorkspacePath(
-      destinationDir ?? path.join("downloads", "exaroton", path.basename(remotePath))
+    const resolvedDestinationDir = resolveDownloadPath(
+      destinationDir ?? path.join("exaroton", path.basename(remotePath))
     );
     const result = await exarotonService.downloadDirectory(remotePath, resolvedDestinationDir, serverId);
 
@@ -262,7 +265,7 @@ server.tool(
 
 server.tool(
   "exaroton_download_world",
-  "Download a world directory like world, world_nether or world_the_end from exaroton into the local workspace.",
+  "Download a world directory like world, world_nether or world_the_end from exaroton into the downloads directory.",
   {
     worldPath: z.string().min(1).optional(),
     destinationDir: z.string().min(1).optional(),
@@ -270,8 +273,8 @@ server.tool(
   },
   async ({ worldPath, destinationDir, serverId }) => {
     const remoteWorldPath = worldPath ?? "world";
-    const resolvedDestinationDir = resolveWorkspacePath(
-      destinationDir ?? path.join("downloads", "exaroton", path.basename(remoteWorldPath))
+    const resolvedDestinationDir = resolveDownloadPath(
+      destinationDir ?? path.join("exaroton", path.basename(remoteWorldPath))
     );
     const result = await exarotonService.downloadDirectory(remoteWorldPath, resolvedDestinationDir, serverId);
 
@@ -467,13 +470,13 @@ main().catch((error) => {
   process.exit(1);
 });
 
-/** Resolves a user-provided destination and rejects paths outside the workspace root. */
-function resolveWorkspacePath(targetPath: string): string {
-  const resolvedPath = path.resolve(paths.workspaceRoot, targetPath);
-  const relativePath = path.relative(paths.workspaceRoot, resolvedPath);
+/** Resolves a destination under downloadsDir and rejects path escape. */
+function resolveDownloadPath(targetPath: string): string {
+  const resolvedPath = path.resolve(paths.downloadsDir, targetPath);
+  const relativePath = path.relative(paths.downloadsDir, resolvedPath);
 
   if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
-    throw new Error(`Destination path must stay inside the workspace root: ${paths.workspaceRoot}`);
+    throw new Error(`Destination path must stay inside the downloads root: ${paths.downloadsDir}`);
   }
 
   return resolvedPath;
