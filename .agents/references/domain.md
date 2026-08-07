@@ -6,9 +6,10 @@ Servidor MCP independente para pontos de mapa (X/Z), receitas/guias e exaroton R
 
 ## Orientação vigente
 
-- Layout plano na raiz; `data/` e downloads configuráveis por env do client.
+- Layout plano na raiz; `data/` e downloads via env do client.
 - Seed de receitas empacotado; store do usuário editável em `MINE_MCP_DATA_DIR`.
+- Skill + plugins fazem parte do produto (não só o servidor).
 
-## Backlog
+## Insights / backlog
 
-Ver `docs/backlog.md` (itens principais do lift/funcional concluídos em 2026-08-07; residual: hints, preview, e2e ampliado, polish de plugins).
+Ver `docs/backlog.md` — insights de produto + milestones **v0.3** (agente/install), **v0.4** (mapa/receitas), **v0.5+** (diferencial).

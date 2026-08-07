@@ -1,6 +1,6 @@
 # Documentation
 
-- [Backlog](backlog.md) — status do backlog funcional e residual
+- [Backlog / roadmap por milestones](backlog.md)
 - [Contributing](../CONTRIBUTING.md)
 - [Security](../SECURITY.md)
 - [Skill mine-mcp](../skills/mine-mcp/SKILL.md)

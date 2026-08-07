@@ -33,7 +33,7 @@ Servidor MCP TypeScript (stdio) para pontos de mapa Minecraft (X/Z), receitas/gu
 - Mudanças localizadas: regras em `src/services/`, persistência em `src/repository/`, contrato MCP (Zod/tools/resources) em `src/index.ts`.
 - stdout = JSON-RPC; logs humanos em stderr (`console.error`).
 - Não acoplar a `../world` / `../output`; layout plano na raiz (`src/`, sem pasta `mine_mcp/` aninhada).
-- Persistência JSON em `data/` (ou `MINE_MCP_DATA_DIR`); backlog residual em `docs/backlog.md`.
+- Persistência JSON em `data/` (ou `MINE_MCP_DATA_DIR`); backlog/milestones em `docs/backlog.md`.
 - Não alterar testes validados sem pedido explícito; não registrar secrets/valores de env.
 
 ## Skills condicionais

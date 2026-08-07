@@ -8,7 +8,10 @@
       "command": "node",
       "args": ["${workspaceFolder}/dist/index.js"],
       "env": {
-        "MINE_MCP_DATA_DIR": "${env:MINE_MCP_DATA_DIR}"
+        "MINE_MCP_DATA_DIR": "${env:MINE_MCP_DATA_DIR}",
+        "MINE_MCP_DOWNLOADS_DIR": "${env:MINE_MCP_DOWNLOADS_DIR}",
+        "EXAROTON_API_TOKEN": "${env:EXAROTON_API_TOKEN}",
+        "EXAROTON_SERVER_ID": "${env:EXAROTON_SERVER_ID}"
       }
     }
   }
