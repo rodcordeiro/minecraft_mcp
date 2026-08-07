@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/rodcordeiro/minecraft_mcp/security/advisories/new
+    about: Report security issues privately (see SECURITY.md). Do not open a public issue.
+  - name: Documentation / backlog
+    url: https://github.com/rodcordeiro/minecraft_mcp/blob/main/docs/backlog.md
+    about: Check known backlog items before opening a duplicate request.

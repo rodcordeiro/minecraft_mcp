@@ -2,6 +2,7 @@
   "name": "mine_mcp",
   "version": "0.2.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "description": "MCP server for Minecraft map points, recipes and exaroton world/file access.",
   "main": "dist/index.js",

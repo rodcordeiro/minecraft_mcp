@@ -1,5 +1,8 @@
 # mine_mcp
 
+[![CI](https://github.com/rodcordeiro/minecraft_mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/rodcordeiro/minecraft_mcp/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Servidor MCP TypeScript (stdio) independente para:
 
 - pontos de mapa Minecraft (coordenadas X/Z);
@@ -91,3 +94,11 @@ GitHub Actions (`.github/workflows/ci.yml`): install → typecheck → test → 
 ## Versão
 
 `0.2.0` — servidor independente, `data/` via env, seed de receitas, skill e plugins Codex/Cursor.
+
+## Comunidade
+
+- [Contributing](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security Policy](SECURITY.md)
+- [License (MIT)](LICENSE)
+- [Backlog](docs/backlog.md)

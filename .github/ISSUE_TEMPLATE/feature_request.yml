@@ -1,0 +1,32 @@
+name: Feature request
+description: Propose an enhancement for mine_mcp
+title: "[feat] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What problem does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the desired behavior, tools, or docs changes.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
+  - type: checkboxes
+    id: contract
+    attributes:
+      label: Contract impact
+      options:
+        - label: This may change MCP tool names, schemas, or resource URIs
+        - label: Documentation / skill / plugin updates are needed
